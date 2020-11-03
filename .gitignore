@@ -1,3 +1,4 @@
+config.yml
 *.log
 .DS_Store
 .env
