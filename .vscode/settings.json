@@ -1,0 +1,8 @@
+{
+    "protoc": {
+        "options": ["--proto_path=third_party/", "--proto_path=api/proto/v1"]
+    },
+    "cSpell.words": [
+        "Grpc"
+    ]
+}

@@ -1,0 +1,10 @@
+server:
+  host: "0.0.0.0"
+  grpcPort: 3000
+  restPort: 3001
+
+logger:
+  LogLevel: debug
+  LogOutputPaths: "stdout"
+  AccessLogLevel: "error"
+  AccessLogOutputPaths: "stdout"
