@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/aaabhilash97/op/pkg/api/v1"
+	v1 "github.com/aaabhilash97/op/pkg/api/v1"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/rest/middleware"
 )
@@ -27,11 +27,13 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}
 
+	logger.InitAccessLogger(logger.LogLevels[logger.Config.AccessLogLevel],
+		logger.Config.AccessLogOutputPaths)
 	srv := &http.Server{
 		Addr: ":" + httpPort,
 		// add handler with middleware
 		Handler: middleware.AddRequestID(
-			middleware.AddLogger(logger.Log, mux)),
+			middleware.AddLogger(logger.AccessLog, mux)),
 	}
 
 	// graceful shutdown

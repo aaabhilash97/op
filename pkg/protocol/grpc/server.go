@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/aaabhilash97/op/pkg/api/v1"
+	v1 "github.com/aaabhilash97/op/pkg/api/v1"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/grpc/middleware"
 )
@@ -20,11 +20,14 @@ func RunServer(ctx context.Context, v1API v1.ToDoServiceServer, port string) err
 		return err
 	}
 
+	// accessLog := logger.InitLogger()
 	// gRPC server statup options
 	opts := []grpc.ServerOption{}
 
+	logger.InitAccessLogger(logger.LogLevels[logger.Config.AccessLogLevel],
+		logger.Config.AccessLogOutputPaths)
 	// add middleware
-	opts = middleware.AddLogging(logger.Log, opts)
+	opts = middleware.AddLogging(logger.AccessLog, opts)
 
 	// register service
 	server := grpc.NewServer(opts...)

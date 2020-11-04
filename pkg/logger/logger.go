@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -11,7 +12,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type logConfig struct {
+type LogConfig struct {
 	LogLevel             string
 	LogOutputPaths       string
 	AccessLogLevel       string
@@ -19,13 +20,15 @@ type logConfig struct {
 }
 
 var (
-	// AccessLog access logger
+
+	// Access Log
 	AccessLog *zap.Logger
+
 	// Log is global logger
 	Log *zap.Logger
 
-	// onceInit guarantee initialize logger only once
-	onceInit sync.Once
+	// accessLogonceInit guarantee initialize logger only once
+	accessLogonceInit sync.Once
 )
 
 // Info - log to info level
@@ -43,73 +46,57 @@ var Warn func(msg string, fields ...zap.Field)
 // Fatal  - log to Fatal level
 var Fatal func(msg string, fields ...zap.Field)
 
-func init() {
-	var config logConfig
+var Config LogConfig
 
-	err := viper.UnmarshalKey("logger", &config)
+func init() {
+
+	viper.SetDefault("logger.LogLevel", "debug")
+	viper.SetDefault("logger.LogOutputPaths", "stdout")
+	viper.SetDefault("logger.AccessLogLevel", "error")
+	viper.SetDefault("logger.AccessLogOutputPaths", "stdout")
+
+	err := viper.UnmarshalKey("logger", &Config)
 	if err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
-	Init(
-		LogLevels[config.LogLevel],
-		config.LogOutputPaths,
-		LogLevels[config.AccessLogLevel],
-		config.AccessLogOutputPaths,
+	fmt.Println(Config)
+	logger := initLogger(
+		LogLevels[Config.LogLevel],
+		Config.LogOutputPaths,
 	)
+	Log = logger
+	Info = logger.Info
+	Error = logger.Error
+	Debug = logger.Debug
+	Warn = logger.Warn
+	Fatal = logger.Fatal
 }
 
 // Init initializes log by input parameters
 // lvl - global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
-func Init(lvl int, logOutputPath string, accessLogLevel int, accessLogOutputPath string) {
+func initLogger(lvl int, logOutputPath string) *zap.Logger {
 
-	onceInit.Do(func() {
-		{
-			if logOutputPath == "" {
-				logOutputPath = "stdout"
-			}
-			loggerConfig := zap.NewProductionConfig()
-			loggerConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-			loggerConfig.DisableStacktrace = true
-			loggerConfig.OutputPaths = strings.Split(logOutputPath, ",")
-			loggerConfig.Level = zap.NewAtomicLevelAt(
-				zapcore.Level(lvl),
-			)
+	loggerConfig := zap.NewProductionConfig()
+	loggerConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	loggerConfig.DisableStacktrace = true
+	loggerConfig.OutputPaths = strings.Split(logOutputPath, ",")
+	loggerConfig.Level = zap.NewAtomicLevelAt(
+		zapcore.Level(lvl),
+	)
 
-			logger, err := loggerConfig.Build()
-			if err != nil {
-				log.Fatal(err)
-			}
-			Log = logger
-			Info = logger.Info
-			Error = logger.Error
-			Debug = logger.Debug
-			Warn = logger.Warn
-			Fatal = logger.Fatal
-		}
+	logger, err := loggerConfig.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return logger
 
-		{
-			if accessLogOutputPath == "" {
-				accessLogOutputPath = "stdout"
-			}
-			loggerConfig := zap.NewProductionConfig()
-			loggerConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-			loggerConfig.DisableCaller = true
-			loggerConfig.DisableStacktrace = true
-			loggerConfig.OutputPaths = strings.Split(
-				accessLogOutputPath, ",")
+}
 
-			loggerConfig.Level = zap.NewAtomicLevelAt(
-				zapcore.Level(accessLogLevel),
-			)
-
-			logger, err := loggerConfig.Build()
-			if err != nil {
-				log.Fatal(err)
-			}
-			AccessLog = logger
-		}
+func InitAccessLogger(lvl int, logOutputPath string) {
+	accessLogonceInit.Do(func() {
+		logger := initLogger(LogLevels[Config.AccessLogLevel], Config.AccessLogOutputPaths)
+		AccessLog = logger
 	})
-
 }
 
 // LogLevels is global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
