@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -59,7 +58,6 @@ func init() {
 	if err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
-	fmt.Println(Config)
 	logger := initLogger(
 		LogLevels[Config.LogLevel],
 		Config.LogOutputPaths,
@@ -92,6 +90,7 @@ func initLogger(lvl int, logOutputPath string) *zap.Logger {
 
 }
 
+// Init logger for middleware loggers
 func InitAccessLogger(lvl int, logOutputPath string) {
 	accessLogonceInit.Do(func() {
 		logger := initLogger(LogLevels[Config.AccessLogLevel], Config.AccessLogOutputPaths)

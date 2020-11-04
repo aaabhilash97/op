@@ -18,22 +18,21 @@ func RunServer() error {
 	ctx := context.Background()
 
 	// get configuration
-	cfg := config.Config
 
-	if len(cfg.Server.GrpcPort) == 0 {
-		return fmt.Errorf("invalid TCP port for gRPC server: '%s'", cfg.Server.GrpcPort)
+	if len(config.Server.GrpcPort) == 0 {
+		return fmt.Errorf("invalid TCP port for gRPC server: '%s'", config.Server.GrpcPort)
 	}
 
-	if len(cfg.Server.RestPort) == 0 {
-		return fmt.Errorf("invalid TCP port for HTTP gateway: '%s'", cfg.Server.RestPort)
+	if len(config.Server.HttpPort) == 0 {
+		return fmt.Errorf("invalid TCP port for HTTP gateway: '%s'", config.Server.HttpPort)
 	}
 
 	v1API := v1.NewToDoServiceServer()
 
 	// run HTTP gateway
 	go func() {
-		_ = rest.RunServer(ctx, cfg.Server.GrpcPort, cfg.Server.RestPort)
+		_ = rest.RunServer(ctx, config.Server.GrpcPort, config.Server.HttpPort)
 	}()
 
-	return grpc.RunServer(ctx, v1API, cfg.Server.GrpcPort)
+	return grpc.RunServer(ctx, v1API, config.Server.GrpcPort)
 }
