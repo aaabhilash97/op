@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 
 	v1 "github.com/aaabhilash97/op/pkg/api/v1"
+	"github.com/aaabhilash97/op/pkg/config"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/rest/middleware"
 )
@@ -50,6 +51,6 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		_ = srv.Shutdown(ctx)
 	}()
 
-	logger.Log.Info("starting HTTP/REST gateway...")
+	logger.Info("starting HTTP/REST gateway", zap.String("port", config.Server.HttpPort))
 	return srv.ListenAndServe()
 }

@@ -5,7 +5,10 @@ LAST_COMMIT:=$$(git rev-list -1 HEAD)
 TAG:=$$(git describe)
 GO_VERSION:=$$(go version)
 
-all: proto restgateway swagger releaseb
+all: proto restgateway swagger generatemodel releaseb
+
+generatemodel:
+	go generate ./pkg/db
 
 installdepend:
 	go get -u -v github.com/golang/protobuf/protoc-gen-go;

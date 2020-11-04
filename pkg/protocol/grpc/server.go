@@ -6,9 +6,11 @@ import (
 	"os"
 	"os/signal"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	v1 "github.com/aaabhilash97/op/pkg/api/v1"
+	"github.com/aaabhilash97/op/pkg/config"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/grpc/middleware"
 )
@@ -48,6 +50,6 @@ func RunServer(ctx context.Context, v1API v1.ToDoServiceServer, port string) err
 	}()
 
 	// start gRPC server
-	logger.Log.Info("starting gRPC server...")
+	logger.Info("starting gRPC server", zap.String("port", config.Server.GrpcPort))
 	return server.Serve(listen)
 }
