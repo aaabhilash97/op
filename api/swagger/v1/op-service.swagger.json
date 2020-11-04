@@ -19,15 +19,15 @@
     "application/json"
   ],
   "paths": {
-    "/v1/todo": {
+    "/api/v1/NewUserRegistration": {
       "post": {
-        "summary": "Create new todo task",
-        "operationId": "ToDoService_Create",
+        "summary": "RegistrationUser new todo task",
+        "operationId": "OpService_NewUserRegistration",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateResponse"
+              "$ref": "#/definitions/v1NewUserRegistrationResponse"
             }
           },
           "404": {
@@ -50,12 +50,12 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateRequest"
+              "$ref": "#/definitions/v1NewUserRegistrationRequest"
             }
           }
         ],
         "tags": [
-          "ToDoService"
+          "OpService"
         ]
       }
     }
@@ -97,58 +97,13 @@
         }
       }
     },
-    "v1CreateRequest": {
+    "v1NewUserRegistrationRequest": {
       "type": "object",
-      "properties": {
-        "api": {
-          "type": "string",
-          "title": "API versioning: it is my best practice to specify version explicitly"
-        },
-        "toDo": {
-          "$ref": "#/definitions/v1ToDo",
-          "title": "Task entity to add"
-        }
-      },
       "title": "Request data to create new todo task"
     },
-    "v1CreateResponse": {
+    "v1NewUserRegistrationResponse": {
       "type": "object",
-      "properties": {
-        "api": {
-          "type": "string",
-          "title": "API versioning: it is my best practice to specify version explicitly"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "ID of created task"
-        }
-      },
       "title": "Contains data of created todo task"
-    },
-    "v1ToDo": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "Unique integer identifier of the todo task"
-        },
-        "title": {
-          "type": "string",
-          "title": "Title of the task"
-        },
-        "description": {
-          "type": "string",
-          "title": "Detail description of the todo task"
-        },
-        "reminder": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Date and time to remind the todo task"
-        }
-      },
-      "title": "Task we have to do"
     }
   }
 }

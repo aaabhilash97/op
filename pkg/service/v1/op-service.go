@@ -15,16 +15,16 @@ const (
 )
 
 // toDoServiceServer is implementation of v1.ToDoServiceServer proto interface
-type toDoServiceServer struct {
+type OpServiceServer struct {
 }
 
-// NewToDoServiceServer creates ToDo service
-func NewToDoServiceServer() v1.ToDoServiceServer {
-	return &toDoServiceServer{}
+// NewOpServiceServer creates ToDo service
+func NewOpServiceServer() v1.OpServiceServer {
+	return &OpServiceServer{}
 }
 
 // checkAPI checks if the API version requested by client is supported by server
-func (s *toDoServiceServer) checkAPI(api string) error {
+func (s *OpServiceServer) checkAPI(api string) error {
 	// API version is "" means use current version of the service
 	if len(api) > 0 {
 		if apiVersion != api {
@@ -36,11 +36,11 @@ func (s *toDoServiceServer) checkAPI(api string) error {
 }
 
 // Create new todo task
-func (s *toDoServiceServer) Create(ctx context.Context, req *v1.CreateRequest) (*v1.CreateResponse, error) {
+func (s *OpServiceServer) NewUserRegistration(ctx context.Context, req *v1.NewUserRegistrationRequest) (*v1.NewUserRegistrationResponse, error) {
 	// check if the API version requested by client is supported by server
-	if err := s.checkAPI(req.Api); err != nil {
+	if err := s.checkAPI(""); err != nil {
 		return nil, err
 	}
 
-	return &v1.CreateResponse{}, nil
+	return &v1.NewUserRegistrationResponse{}, nil
 }
