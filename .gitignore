@@ -7,4 +7,3 @@ debug
 dist/
 **/__pycache__
 **/*.pyc
-misc/bank_config_idfc.json
