@@ -1,5 +1,5 @@
-# GRPC boilerplate
+# GRPC boilerplate golang
 
-## How the configuration handled
+A boilerplate for building GRPC and Restful(grpc-gateway) APIs using Golang and MongoDB
 
-config, DB client, logger will self initialize if it imported based on the configuration provided. If configuration block missing in configuration source(config.yml), If will silently fail to initialize.
+Thanks to https://medium.com/@amsokol.com
