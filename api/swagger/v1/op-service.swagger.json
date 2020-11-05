@@ -4,7 +4,7 @@
     "title": "Op service",
     "version": "1.0",
     "contact": {
-      "name": "go-grpc-http-rest-microservice-tutorial project",
+      "name": "op",
       "url": "https://github.com/aaabhilash97/op",
       "email": "medium@amsokol.com"
     }
@@ -21,7 +21,7 @@
   "paths": {
     "/api/v1/NewUserRegistration": {
       "post": {
-        "summary": "RegistrationUser new todo task",
+        "summary": "RegistrationUser new op task",
         "operationId": "OpService_NewUserRegistration",
         "responses": {
           "200": {
@@ -99,11 +99,11 @@
     },
     "v1NewUserRegistrationRequest": {
       "type": "object",
-      "title": "Request data to create new todo task"
+      "title": "Request data to create new op"
     },
     "v1NewUserRegistrationResponse": {
       "type": "object",
-      "title": "Contains data of created todo task"
+      "title": "Contains data of created op"
     }
   }
 }

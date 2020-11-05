@@ -10,14 +10,21 @@ import (
 	"google.golang.org/grpc"
 
 	v1 "github.com/aaabhilash97/op/pkg/api/v1"
-	"github.com/aaabhilash97/op/pkg/config"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/grpc/middleware"
 )
 
+type RunServerOptions struct {
+	Ctx       context.Context
+	V1API     v1.OpServiceServer
+	Port      string
+	AccessLog *zap.Logger
+}
+
 // RunServer runs gRPC service to publish ToDo service
-func RunServer(ctx context.Context, v1API v1.OpServiceServer, port string) error {
-	listen, err := net.Listen("tcp", ":"+port)
+func RunServer(option RunServerOptions) error {
+
+	listen, err := net.Listen("tcp", ":"+option.Port)
 	if err != nil {
 		return err
 	}
@@ -26,14 +33,12 @@ func RunServer(ctx context.Context, v1API v1.OpServiceServer, port string) error
 	// gRPC server statup options
 	opts := []grpc.ServerOption{}
 
-	logger.InitAccessLogger(logger.LogLevels[logger.Config.AccessLogLevel],
-		logger.Config.AccessLogOutputPaths)
 	// add middleware
-	opts = middleware.AddLogging(logger.AccessLog, opts)
+	opts = middleware.AddLogging(option.AccessLog, opts)
 
 	// register service
 	server := grpc.NewServer(opts...)
-	v1.RegisterOpServiceServer(server, v1API)
+	v1.RegisterOpServiceServer(server, option.V1API)
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
@@ -41,15 +46,15 @@ func RunServer(ctx context.Context, v1API v1.OpServiceServer, port string) error
 	go func() {
 		for range c {
 			// sig is a ^C, handle it
-			logger.Log.Warn("shutting down gRPC server...")
+			logger.Warn("shutting down gRPC server...")
 
 			server.GracefulStop()
 
-			<-ctx.Done()
+			<-option.Ctx.Done()
 		}
 	}()
 
 	// start gRPC server
-	logger.Info("starting gRPC server", zap.String("port", config.Server.GrpcPort))
+	logger.Info("starting gRPC server", zap.String("port", option.Port))
 	return server.Serve(listen)
 }

@@ -12,7 +12,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 version : "1.0";
 contact : {
 name:
-  "go-grpc-http-rest-microservice-tutorial project";
+  "op";
 url:
   "https://github.com/aaabhilash97/op";
 email:
@@ -40,16 +40,16 @@ type:
 }
 ;
 
-// Request data to create new todo task
+// Request data to create new op
 message NewUserRegistrationRequest {}
 
-// Contains data of created todo task
+// Contains data of created op
 message NewUserRegistrationResponse {}
 
-// Service to manage list of todo tasks
+// Service to manage list of op
 service OpService {
 
-  // RegistrationUser new todo task
+  // RegistrationUser new op task
   rpc NewUserRegistration(NewUserRegistrationRequest)
       returns (NewUserRegistrationResponse) {
     option (google.api.http) = {

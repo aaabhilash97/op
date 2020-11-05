@@ -1,4 +1,4 @@
-package readconfig
+package readappconfig
 
 import (
 	"log"
@@ -17,5 +17,3 @@ func init() {
 		log.Fatalf("Error reading config file, %s", err)
 	}
 }
-
-func Init() {}

@@ -5,29 +5,17 @@ import (
 	"strings"
 	"sync"
 
-	_ "github.com/aaabhilash97/op/pkg/config/readconfig"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-type LogConfig struct {
-	LogLevel             string
-	LogOutputPaths       string
-	AccessLogLevel       string
-	AccessLogOutputPaths string
-}
-
 var (
-
-	// Access Log
-	AccessLog *zap.Logger
 
 	// Log is global logger
 	Log *zap.Logger
 
 	// accessLogonceInit guarantee initialize logger only once
-	accessLogonceInit sync.Once
+	onceInit sync.Once
 )
 
 // Info - log to info level
@@ -45,23 +33,15 @@ var Warn func(msg string, fields ...zap.Field)
 // Fatal  - log to Fatal level
 var Fatal func(msg string, fields ...zap.Field)
 
-var Config LogConfig
-
+// Initialize default logger with stdout and debug level
 func init() {
-
-	viper.SetDefault("logger.LogLevel", "debug")
-	viper.SetDefault("logger.LogOutputPaths", "stdout")
-	viper.SetDefault("logger.AccessLogLevel", "error")
-	viper.SetDefault("logger.AccessLogOutputPaths", "stdout")
-
-	err := viper.UnmarshalKey("logger", &Config)
-	if err != nil {
-		log.Fatalf("Unable to decode into struct, %v", err)
-	}
-	logger := initLogger(
-		LogLevels[Config.LogLevel],
-		Config.LogOutputPaths,
+	logger, err := CreateLogger(
+		LogLevels["debug"],
+		"stdout",
 	)
+	if err != nil {
+		log.Fatal("Failed initialize logger", err)
+	}
 	Log = logger
 	Info = logger.Info
 	Error = logger.Error
@@ -70,9 +50,27 @@ func init() {
 	Fatal = logger.Fatal
 }
 
+func Init(level, output string) {
+	onceInit.Do(func() {
+		logger, err := CreateLogger(
+			LogLevels[level],
+			output,
+		)
+		if err != nil {
+			log.Fatal("Failed initialize logger", err)
+		}
+		Log = logger
+		Info = logger.Info
+		Error = logger.Error
+		Debug = logger.Debug
+		Warn = logger.Warn
+		Fatal = logger.Fatal
+	})
+}
+
 // Init initializes log by input parameters
 // lvl - global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
-func initLogger(lvl int, logOutputPath string) *zap.Logger {
+func CreateLogger(lvl int, logOutputPath string) (*zap.Logger, error) {
 
 	loggerConfig := zap.NewProductionConfig()
 	loggerConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -83,19 +81,8 @@ func initLogger(lvl int, logOutputPath string) *zap.Logger {
 	)
 
 	logger, err := loggerConfig.Build()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return logger
+	return logger, err
 
-}
-
-// Init logger for middleware loggers
-func InitAccessLogger(lvl int, logOutputPath string) {
-	accessLogonceInit.Do(func() {
-		logger := initLogger(LogLevels[Config.AccessLogLevel], Config.AccessLogOutputPaths)
-		AccessLog = logger
-	})
 }
 
 // LogLevels is global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)

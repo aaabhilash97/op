@@ -4,26 +4,28 @@ import (
 	"context"
 	"time"
 
-	"github.com/aaabhilash97/op/pkg/config"
-	"github.com/aaabhilash97/op/pkg/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //go:generate go run gen/cmd/gen.go
 
-// Collections _ connected collections from model
-var Users *UserModel
+type DB struct {
+	// Collections _ connected collections from model
+	Users *UserModel
+}
+
+type Options struct {
+	Client *mongo.Client
+	DB     string // db name to connect
+}
 
 // ConnectAll -- connect to mongo tables
-func init() {
-	if config.Mongo.Client == nil {
-		logger.Debug("Mongo client is not initialized")
-	}
-	clientDB := config.Mongo.Client.Database(config.Mongo.DB)
-
-	collectionName := "users"
-	Users = &UserModel{
-		collection: clientDB.Collection(collectionName),
+func Connect(opt Options) *DB {
+	clientDB := opt.Client.Database(opt.DB)
+	return &DB{
+		Users: &UserModel{
+			collection: clientDB.Collection("users"),
+		},
 	}
 }
 

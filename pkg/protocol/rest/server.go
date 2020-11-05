@@ -12,29 +12,33 @@ import (
 	"google.golang.org/grpc"
 
 	v1 "github.com/aaabhilash97/op/pkg/api/v1"
-	"github.com/aaabhilash97/op/pkg/config"
 	"github.com/aaabhilash97/op/pkg/logger"
 	"github.com/aaabhilash97/op/pkg/protocol/rest/middleware"
 )
 
+type RunServerOptions struct {
+	Ctx       context.Context
+	GrpcPort  string
+	HttpPort  string
+	AccessLog *zap.Logger
+}
+
 // RunServer runs HTTP/REST gateway
-func RunServer(ctx context.Context, grpcPort, httpPort string) error {
-	ctx, cancel := context.WithCancel(ctx)
+func RunServer(option RunServerOptions) error {
+	ctx, cancel := context.WithCancel(option.Ctx)
 	defer cancel()
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	if err := v1.RegisterOpServiceHandlerFromEndpoint(ctx, mux, "localhost:"+grpcPort, opts); err != nil {
+	if err := v1.RegisterOpServiceHandlerFromEndpoint(ctx, mux, "localhost:"+option.GrpcPort, opts); err != nil {
 		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}
 
-	logger.InitAccessLogger(logger.LogLevels[logger.Config.AccessLogLevel],
-		logger.Config.AccessLogOutputPaths)
 	srv := &http.Server{
-		Addr: ":" + httpPort,
+		Addr: ":" + option.HttpPort,
 		// add handler with middleware
 		Handler: middleware.AddRequestID(
-			middleware.AddLogger(logger.AccessLog, mux)),
+			middleware.AddLogger(option.AccessLog, mux)),
 	}
 
 	// graceful shutdown
@@ -51,6 +55,6 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		_ = srv.Shutdown(ctx)
 	}()
 
-	logger.Info("starting HTTP/REST gateway", zap.String("port", config.Server.HttpPort))
+	logger.Info("starting HTTP/REST gateway", zap.String("port", option.HttpPort))
 	return srv.ListenAndServe()
 }

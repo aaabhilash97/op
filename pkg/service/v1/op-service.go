@@ -7,6 +7,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	v1 "github.com/aaabhilash97/op/pkg/api/v1"
+	"github.com/aaabhilash97/op/pkg/config"
+	"github.com/aaabhilash97/op/pkg/db"
 )
 
 const (
@@ -16,11 +18,21 @@ const (
 
 // toDoServiceServer is implementation of v1.ToDoServiceServer proto interface
 type OpServiceServer struct {
+	config config.Config
+	db     *db.DB
+}
+
+type Options struct {
+	Config config.Config
+	DB     *db.DB
 }
 
 // NewOpServiceServer creates ToDo service
-func NewOpServiceServer() v1.OpServiceServer {
-	return &OpServiceServer{}
+func NewOpServiceServer(opt Options) v1.OpServiceServer {
+	return &OpServiceServer{
+		config: opt.Config,
+		db:     opt.DB,
+	}
 }
 
 // checkAPI checks if the API version requested by client is supported by server
