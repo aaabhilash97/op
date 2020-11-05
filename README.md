@@ -1,4 +1,4 @@
-# GRPC boilerplate golang
+# Golang GRPC boilerplate
 
 A boilerplate for building GRPC and Restful(grpc-gateway) APIs using Golang and MongoDB
 
