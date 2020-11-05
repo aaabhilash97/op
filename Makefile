@@ -68,7 +68,7 @@ releaseclientb:
 # Create release binary for current Platform
 binaryfordocker:
 	@ echo "Compiling client release binary"
-	@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.gitCommit=$(LAST_COMMIT) -X main.gitTag=$(TAG)" -a -installsuffix cgo -o /go/bin/onionlife ./cmd/server/main.go
+	@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.gitCommit=$(LAST_COMMIT) -X main.gitTag=$(TAG)" -a -installsuffix cgo -o /go/bin/op ./cmd/server/main.go
 	@ echo "Compiling client binary success - output=dist/server-$(PLATFORM_INFO)"
 
 # Create debug binary for current platform
