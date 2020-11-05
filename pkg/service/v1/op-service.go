@@ -16,7 +16,7 @@ const (
 	apiVersion = "v1"
 )
 
-// toDoServiceServer is implementation of v1.ToDoServiceServer proto interface
+// opServiceServer is implementation of v1.OpServiceServer proto interface
 type OpServiceServer struct {
 	config config.Config
 	db     *db.DB
@@ -27,7 +27,7 @@ type Options struct {
 	DB     *db.DB
 }
 
-// NewOpServiceServer creates ToDo service
+// NewOpServiceServer creates Op service
 func NewOpServiceServer(opt Options) v1.OpServiceServer {
 	return &OpServiceServer{
 		config: opt.Config,
@@ -47,7 +47,6 @@ func (s *OpServiceServer) checkAPI(api string) error {
 	return nil
 }
 
-// Create new todo task
 func (s *OpServiceServer) NewUserRegistration(ctx context.Context, req *v1.NewUserRegistrationRequest) (*v1.NewUserRegistrationResponse, error) {
 	// check if the API version requested by client is supported by server
 	if err := s.checkAPI(""); err != nil {

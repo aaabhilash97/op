@@ -21,7 +21,7 @@ type RunServerOptions struct {
 	AccessLog *zap.Logger
 }
 
-// RunServer runs gRPC service to publish ToDo service
+// RunServer runs gRPC service to publish Op service
 func RunServer(option RunServerOptions) error {
 
 	listen, err := net.Listen("tcp", ":"+option.Port)
